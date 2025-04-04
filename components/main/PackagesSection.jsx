@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter} from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   Tabs,
@@ -17,6 +18,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const CFSCard = ({ title, location, rating, description, images }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -91,12 +98,20 @@ const CFSCard = ({ title, location, rating, description, images }) => {
           <p className="mt-3 text-sm text-gray-600">{description}</p>
         </div>
         
-        <Button 
-          className="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white"
-          onClick={() => setLoginModalOpen(true)}
-        >
-          View Details
-        </Button>
+        <div className="flex gap-4 mt-4">
+          <Button 
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+            onClick={() => setLoginModalOpen(true)}
+          >
+            View Details
+          </Button>
+          <Button 
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => setLoginModalOpen(true)}
+          >
+            Book Now
+          </Button>
+        </div>
       </div>
       
       {/* Login Dialog */}
@@ -165,10 +180,28 @@ const CFSCard = ({ title, location, rating, description, images }) => {
 };
 
 const PackagesSection = () => {
+  const router = useRouter();
   const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [locationFilter, setLocationFilter] = useState("all");
 
   const toggleNewsPanel = () => {
     setIsNewsPanelOpen(!isNewsPanelOpen);
+  };
+
+  // Function to check if user is logged in
+  const isUserLoggedIn = () => {
+    // Replace this with your actual authentication check
+    // For example, checking localStorage, JWT token, or session
+    return localStorage.getItem('user') !== null;
+  };
+
+  const handleViewDetails = (id) => {
+    if (isUserLoggedIn()) {
+      router.push(`/view-details/${id}`);
+    } else {
+      setLoginModalOpen(true);
+    }
   };
 
   // CFS facilities data
@@ -223,6 +256,14 @@ const PackagesSection = () => {
     }
   ];
 
+  // Add this function to get unique locations
+  const locations = ["all", ...new Set(cfsFacilities.map(facility => facility.location))];
+
+  // Update the filtered facilities
+  const filteredFacilities = cfsFacilities.filter(facility => 
+    locationFilter === "all" || facility.location === locationFilter
+  );
+
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -232,23 +273,37 @@ const PackagesSection = () => {
           </div>
 
           <div className="flex items-center mt-4 md:mt-0 space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
-              onClick={toggleNewsPanel}
-            >
-              <Bell className="h-4 w-4" />
-              News & Updates
-            </Button>
-            <Link href="#" className="flex items-center text-teal-700 font-medium hover:underline ml-4">
-              VIEW ALL <ArrowRight className="h-4 w-4 ml-1" />
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className="flex flex-col items-center px-3 py-2 transition-all bg-teal-600 text-white rounded-full hover:bg-teal-700"
+                >
+                  <Filter className="h-6 w-6" />
+                  <span className="text-xs font-medium mt-1">Filter</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <div className="p-2 text-sm font-medium text-gray-500">Filter by Location</div>
+                {locations.map((location) => (
+                  <DropdownMenuItem
+                    key={location}
+                    className={`flex items-center gap-2 ${
+                      locationFilter === location ? 'bg-teal-50 text-teal-600' : ''
+                    }`}
+                    onClick={() => setLocationFilter(location)}
+                  >
+                    <MapPin className="h-4 w-4" />
+                    {location === "all" ? "All Locations" : location.split(",")[0]}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          {cfsFacilities.map((facility) => (
+          {filteredFacilities.map((facility) => (
             <CFSCard 
               key={facility.id}
               title={facility.title}

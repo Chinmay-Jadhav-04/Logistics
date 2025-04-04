@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Truck } from 'lucide-react';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -85,12 +85,21 @@ const LandTransportCard = ({ title, location, rating, description, images }) => 
           <p className="mt-3 text-sm text-gray-600">{description}</p>
         </div>
         
-        <Button 
-          className="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white"
-          onClick={() => setLoginModalOpen(true)}
-        >
-          View Details
-        </Button>
+      <div className="flex gap-4 mt-4">
+                <Button 
+                  className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                  onClick={() => setLoginModalOpen(true)}
+                >
+                  View Details
+                </Button>
+                <Button 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setLoginModalOpen(true)}
+                >
+                  Book Now
+                </Button>
+              </div>
+            
       </div>
       
       {/* Login Dialog */}
@@ -174,9 +183,9 @@ const LandTransport = () => {
       rating: 4.7,
       description: "Fast and reliable road freight transport with real-time tracking and priority delivery options.",
       images: [
-        "/truck1.jpg",
-        "/truck2.jpg",
-        "/truck3.jpg",
+        "/Gaadi.jpg",
+        "/Gaadi1.jpg",
+        "/Gaadi2.jpeg",
       ]
     },
     {
@@ -187,8 +196,8 @@ const LandTransport = () => {
       description: "Dedicated vehicle transport for large shipments with optimized routes and scheduled delivery.",
       images: [
         "/TruckKun.jpg",
-        "/ftl2.jpg",
-        "/ftl3.jpg",
+        "/TruckKun1.jpg",
+        "/TruckKun2.jpg",
       ]
     },
     {
@@ -198,9 +207,9 @@ const LandTransport = () => {
       rating: 4.2,
       description: "Cost-effective solution for smaller shipments with consolidated freight and flexible scheduling.",
       images: [
-        "/ltl1.jpg",
-        "/ltl2.jpg",
-        "/ltl3.jpg",
+        "/Truckkundra.jpg",
+        "/Truckkundra1.jpg",
+        "/Trudkkundra2.jpg",
       ]
     },
     {
@@ -210,9 +219,9 @@ const LandTransport = () => {
       rating: 4.6,
       description: "Temperature-controlled transportation for perishable goods with monitoring systems and quality assurance.",
       images: [
-        "/reefer1.jpg",
-        "/reefer2.jpg",
-        "/reefer3.jpg",
+        "/Thala.jpg",
+        "/Thala1.jpg",
+        "/Thala2.jpg",
       ]
     }
   ];
@@ -225,20 +234,6 @@ const LandTransport = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Land Transport Services</h2>
           </div>
 
-          <div className="flex items-center mt-4 md:mt-0 space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
-              onClick={toggleNewsPanel}
-            >
-              <Bell className="h-4 w-4" />
-              News & Updates
-            </Button>
-            <Link href="#" className="flex items-center text-teal-700 font-medium hover:underline ml-4">
-              VIEW ALL <ArrowRight className="h-4 w-4 ml-1" />
-            </Link>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6">

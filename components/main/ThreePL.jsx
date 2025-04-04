@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -85,12 +85,21 @@ const ThreePLCard = ({ title, location, rating, description, images }) => {
           <p className="mt-3 text-sm text-gray-600">{description}</p>
         </div>
         
-        <Button 
-          className="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white"
-          onClick={() => setLoginModalOpen(true)}
-        >
-          View Details
-        </Button>
+ <div className="flex gap-4 mt-4">
+           <Button 
+             className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+             onClick={() => setLoginModalOpen(true)}
+           >
+             View Details
+           </Button>
+           <Button 
+             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+             onClick={() => setLoginModalOpen(true)}
+           >
+             Book Now
+           </Button>
+         </div>
+       
       </div>
       
       {/* Login Dialog */}
@@ -174,9 +183,9 @@ const ThreePL  = () => {
       rating: 4.8,
       description: "End-to-end supply chain management with custom solutions for inventory, distribution, and fulfillment.",
       images: [
-        "/3pl1.jpg",
-        "/3pl2.jpg",
-        "/3pl3.jpg",
+        "/Thor.jpg",
+        "/Thor1.jpg",
+        "/Thor2.jpg",
       ]
     },
     {
@@ -186,9 +195,9 @@ const ThreePL  = () => {
       rating: 4.6,
       description: "Specialized fulfillment services for online retailers with fast processing and same-day shipping options.",
       images: [
-        "/ecom1.jpg",
-        "/ecom2.jpg",
-        "/ecom3.jpg",
+        "/Loki.jpg",
+        "/Loki1.jpg",
+        "/loki2.jpg",
       ]
     },
     {
@@ -198,9 +207,9 @@ const ThreePL  = () => {
       rating: 4.3,
       description: "Strategic distribution services with multi-channel capabilities and retail compliance expertise.",
       images: [
-        "/retail1.jpg",
-        "/retail2.jpg",
-        "/retail3.jpg",
+        "/IronMan.jpg",
+        "/IronMan1.jpg",
+        "/IronMan2.png",
       ]
     },
     {
@@ -210,9 +219,9 @@ const ThreePL  = () => {
       rating: 4.4,
       description: "Comprehensive processing services including kitting, packaging, labeling, and quality control.",
       images: [
-        "/vas1.jpg",
-        "/vas2.jpg",
-        "/vas3.jpg",
+        "/Spiderman.jpg",
+        "/Spiderman1.jpg",
+        "/SpiderMan2.webp",
       ]
     }
   ];
@@ -225,20 +234,7 @@ const ThreePL  = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">3PL Services</h2>
           </div>
 
-          <div className="flex items-center mt-4 md:mt-0 space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
-              onClick={toggleNewsPanel}
-            >
-              <Bell className="h-4 w-4" />
-              News & Updates
-            </Button>
-            <Link href="#" className="flex items-center text-teal-700 font-medium hover:underline ml-4">
-              VIEW ALL <ArrowRight className="h-4 w-4 ml-1" />
-            </Link>
-          </div>
+          
         </div>
 
         <div className="grid grid-cols-1 gap-6">

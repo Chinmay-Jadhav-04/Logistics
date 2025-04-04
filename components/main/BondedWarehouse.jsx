@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Warehouse } from 'lucide-react';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -85,12 +85,21 @@ const BondedWarehouseCard = ({ title, location, rating, description, images }) =
           <p className="mt-3 text-sm text-gray-600">{description}</p>
         </div>
         
-        <Button 
-          className="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white"
-          onClick={() => setLoginModalOpen(true)}
-        >
-          View Details
-        </Button>
+      <div className="flex gap-4 mt-4">
+                <Button 
+                  className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                  onClick={() => setLoginModalOpen(true)}
+                >
+                  View Details
+                </Button>
+                <Button 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setLoginModalOpen(true)}
+                >
+                  Book Now
+                </Button>
+              </div>
+            
       </div>
       
       {/* Login Dialog */}
@@ -174,9 +183,9 @@ const BondedWarehouseSection = () => {
       rating: 4.7,
       description: "Secure customs bonded facility with duty deferment and specialized handling for imported goods.",
       images: [
-        "/bw1.jpg",
-        "/bw2.jpg",
-        "/bw3.jpg",
+        "/Luffy.jpg",
+        "/Luffy1.webp",
+        "/Luffy2.jpg",
       ]
     },
     {
@@ -186,9 +195,9 @@ const BondedWarehouseSection = () => {
       rating: 4.5,
       description: "Air cargo bonded warehousing with temperature-controlled storage and customs clearance services.",
       images: [
-        "/bwair1.jpg",
-        "/bwair2.jpg",
-        "/bwair3.jpg",
+        "/Luffy.jpg",
+        "/Luffy1.webp",
+        "/Luffy2.jpg",
       ]
     },
     {
@@ -198,9 +207,9 @@ const BondedWarehouseSection = () => {
       rating: 4.6,
       description: "Strategic bonded warehouse at India's largest private port with extensive storage capabilities.",
       images: [
-        "/bwmundra1.jpg",
-        "/bwmundra2.jpg",
-        "/bwmundra3.jpg",
+        "/Luffy.jpg",
+        "/Luffy1.webp",
+        "/Luffy2.jpg",
       ]
     },
     {
@@ -210,9 +219,9 @@ const BondedWarehouseSection = () => {
       rating: 4.4,
       description: "Export-focused bonded warehouse with value-added services and streamlined documentation process.",
       images: [
-        "/bwchennai1.jpg",
-        "/bwchennai2.jpg",
-        "/bwchennai3.jpg",
+        "/Luffy.jpg",
+        "/Luffy1.webp",
+        "/Luffy2.jpg",
       ]
     }
   ];
@@ -223,21 +232,6 @@ const BondedWarehouseSection = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Bonded Warehouse Facilities</h2>
-          </div>
-
-          <div className="flex items-center mt-4 md:mt-0 space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
-              onClick={toggleNewsPanel}
-            >
-              <Bell className="h-4 w-4" />
-              News & Updates
-            </Button>
-            <Link href="#" className="flex items-center text-teal-700 font-medium hover:underline ml-4">
-              VIEW ALL <ArrowRight className="h-4 w-4 ml-1" />
-            </Link>
           </div>
         </div>
 
