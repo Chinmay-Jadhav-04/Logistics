@@ -1,6 +1,19 @@
 'use client';
 
-const Splashscreen = () => {
+import { useEffect } from 'react';
+
+const Splashscreen = ({ finishLoading }) => {
+  useEffect(() => {
+    // Add a delay before finishing loading
+    const timer = setTimeout(() => {
+      if (finishLoading) {
+        finishLoading();
+      }
+    }, 2000); // 2 seconds delay
+
+    return () => clearTimeout(timer);
+  }, [finishLoading]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <div className="text-center">
@@ -12,4 +25,5 @@ const Splashscreen = () => {
 };
 
 export default Splashscreen;
+
 

@@ -15,26 +15,31 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   const [loading, setLoading] = useState(true);
-  const [isFirstVisit, setIsFirstVisit] = useState(true);
 
   useEffect(() => {
-    // Check if this is the first visit
-    const hasVisited = localStorage.getItem('hasVisited');
-    setIsFirstVisit(!hasVisited);
+    // Reset loading state on route change or page refresh
+    setLoading(true);
+
+    // Optional: Add event listener for route changes if using Next.js routing
+    const handleRouteChange = () => {
+      setLoading(true);
+    };
+
+    window.addEventListener('beforeunload', handleRouteChange);
     
-    if (!hasVisited) {
-      localStorage.setItem('hasVisited', 'true');
-    }
+    return () => {
+      window.removeEventListener('beforeunload', handleRouteChange);
+    };
   }, []);
 
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
-          {isFirstVisit && loading ? (
+          {loading ? (
             <SplashScreen finishLoading={() => setLoading(false)} />
           ) : null}
-          <div style={{ opacity: isFirstVisit && loading ? 0 : 1 }}>
+          <div style={{ opacity: loading ? 0 : 1 }}>
             <Navbar />
             {children}
             <Footer />
@@ -44,4 +49,5 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
 
