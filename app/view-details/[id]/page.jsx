@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { Phone, ArrowLeft, Mail } from "lucide-react"
+import { Phone, ArrowLeft, Mail, Calendar } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -192,14 +192,26 @@ export default function ViewDetails({ params }) {
             <div>
               <h2 className="text-xl font-semibold mb-2">Select Date & Time</h2>
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={date => setSelectedDate(date)}
-                  minDate={new Date()}
-                  dateFormat="MMMM d, yyyy"
-                  className="w-full p-2 border rounded mb-4"
-                  placeholderText="Select date"
-                />
+                <div className="relative">
+                  <div className="relative inline-block w-full">
+                    <DatePicker
+                      selected={selectedDate}
+                      onChange={date => setSelectedDate(date)}
+                      minDate={new Date()}
+                      dateFormat="MMMM d, yyyy"
+                      className="w-full p-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholderText="Select date"
+                      customInput={
+                        <input
+                          type="text"
+                          className="w-full p-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                        />
+                      }
+                      customInputRef="ref"
+                    />
+                    <Calendar className="w-5 h-5 text-gray-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
                 
                 <div className="space-y-2">
                   <p className="font-medium mb-2">Available Slots:</p>
@@ -249,6 +261,14 @@ export default function ViewDetails({ params }) {
     </div>
   )
 }
+
+
+
+
+
+
+
+
 
 
 
