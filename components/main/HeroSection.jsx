@@ -5,105 +5,233 @@ import {
   Warehouse, 
   Truck, 
   Package, 
-  ListFilter as Filter, 
   Home as House, 
-  MapPin, 
-  ClockArrowUp
+  ClockArrowUp,
+  Bell,
+  X,
+  Info,
+  CheckCircle
 } from 'lucide-react';
-import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 const HeroSection = ({ onSectionChange }) => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [activeService, setActiveService] = useState(null);
-  const [isSticky, setIsSticky] = useState(false);
-  
-  // Add scroll event listener to detect when to make the section sticky
+  const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
+
+  // Add toggleNewsPanel function
+  const toggleNewsPanel = () => {
+    setIsNewsPanelOpen(!isNewsPanelOpen);
+  };
+
+  // Add closeNewsPanel function
+  const closeNewsPanel = () => {
+    setIsNewsPanelOpen(false);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
-      // Get the height of the navbar (adjust this value if needed)
-      const navbarHeight = 72; // Approximate height of your navbar
-      
-      // Make the hero section sticky when scrolled past a certain point
       if (window.scrollY > 100) {
-        setIsSticky(true);
+        setIsScrolled(true);
       } else {
-        setIsSticky(false);
+        setIsScrolled(false);
       }
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const services = [
-    { id: "cfs-icd", name: "CFS & ICD", icon: <Warehouse size={20}/> },
-    { id: "land-transport", name: "Land Transport", icon: <Truck size={20}/> },
-    { id: "3pl", name: "3PL", icon: <Package size={20}/> },
-    { id: "bonded-warehouse", name: "Bonded Warehouse", icon: <House size={20}/> },
-    { id: "My-Orders", name: "My Orders", icon: <ClockArrowUp size={20}/> },
+    {
+      id: "cfs-icd",
+      name: "CFS & ICD",
+      icon: Warehouse,
+    },
+    {
+      id: "land-transport",
+      name: "Land Transport",
+      icon: Truck,
+    },
+    {
+      id: "3pl",
+      name: "3PL",
+      icon: Package,
+    },
+    {
+      id: "bonded-warehouse",
+      name: "Bonded Warehouse",
+      icon: House,
+    },
+    {
+      id: "my-orders",
+      name: "My Orders",
+      icon: ClockArrowUp,
+    },
   ];
 
   const handleServiceClick = (serviceId) => {
     setActiveService(serviceId);
     onSectionChange(serviceId);
-
-    if (serviceId === "cfs-icd") {
-      onSectionChange('hero');
-      // Find the packages section and scroll to it
-      const packagesSection = document.querySelector('section.py-12.bg-gray-50');
-      if (packagesSection) {
-        packagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Wait for scroll to complete, then click the CFS tab
-        setTimeout(() => {
-          const cfsTabTrigger = document.querySelector('[value="cfs-facilities"]');
-          if (cfsTabTrigger) {
-            cfsTabTrigger.click();
-          }
-        }, 500);
-      }
-    } else {
-      onSectionChange(serviceId);
-    }
   };
 
   return (
-    <section 
-      className={`w-full bg-gradient-to-r from-gray-100 to-gray-200 overflow-hidden transition-all duration-300 z-[40]
-        ${isSticky ? 'fixed top-0 left-0 shadow-md py-2' : 'relative py-8'}`}
-      style={{ 
-        top: isSticky ? '64px' : '0',
-        transform: isSticky ? 'translateY(0)' : 'translateY(0)'
-      }}
-    >
-      <div className="container mx-auto px-4 relative">
-        <div className="max-w-6xl mx-auto flex justify-center">
-          <div className="w-full overflow-x-auto scrollbar-hide">
-            <div className="flex justify-center min-w-max px-2">
-              <div className={`border-2 border-white rounded-full p-2 bg-white bg-opacity-50 backdrop-blur-sm
-                ${isSticky ? 'scale-95' : ''}`}>
-                <div className="flex items-center justify-center gap-3">
-                  {services.map((item) => (
-                    <Button
-                      key={item.id}
-                      variant="secondary"
-                      className={`flex flex-col items-center px-3 py-2 transition-all group ${
-                        activeService === item.id ? "bg-white text-teal-600" 
-                          : "bg-white text-gray-600 hover:text-teal-600"
-                      } ${isSticky ? 'scale-95' : ''}`}
-                      onClick={() => handleServiceClick(item.id)}
-                    >
-                      <div className={`mb-1 ${activeService === item.id ? "text-teal-600" : "text-gray-600 group-hover:text-teal-600"}`}>
-                        {item.icon}
-                      </div>
-                      <span className="text-xs font-medium">{item.name}</span>
-                    </Button>
-                  ))}
+    <>
+      {/* Mobile View */}
+      <div className="md:hidden flex flex-wrap justify-center gap-4 p-4">
+        {services.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => handleServiceClick(item.id)}
+            className={cn(
+              "flex flex-col items-center w-[calc(33.33%-1rem)] p-2 rounded-lg transition-all duration-200",
+              activeService === item.id
+                ? "bg-teal-50 text-teal-600"
+                : "hover:bg-gray-50"
+            )}
+          >
+            <div className={cn(
+              "rounded-full p-2 mb-1",
+              activeService === item.id ? "bg-teal-400" : "bg-gray-100"
+            )}>
+              <item.icon className={`h-5 w-5 ${activeService === item.id && 'text-white'}`} />
+            </div>
+            <span className="text-xs font-medium text-center">{item.name}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop View (Original) */}
+      <div className={cn(
+        "hidden md:flex bg-white py-3 px-4 rounded-full mx-auto max-w-3xl justify-between items-center shadow-md border border-gray-200",
+        isScrolled ? "opacity-0" : "opacity-100 transition-opacity duration-300"
+      )}>
+        <div className="flex justify-center space-x-12 flex-1">
+          {services.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleServiceClick(item.id)}
+              className={cn(
+                "flex flex-col items-center px-1 py-1 rounded-lg transition-all duration-200",
+                activeService === item.id
+                  ? "text-gray-500"
+                  : "hover:text-teal-500/80"
+              )}
+            >
+              <div className={cn(
+                "rounded-full p-2 mb-1",
+                activeService === item.id ? "bg-teal-400" : "bg-gray-100"
+              )}>
+                <item.icon className={`h-5 w-5 ${activeService === item.id && 'text-white'}`} />
+              </div>
+              <span className="text-sm font-medium">{item.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Fixed header that appears when scrolled (Original) */}
+      <div className={cn(
+        "fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-white to-gray-50 shadow-md py-2 px-3 sm:px-6 transition-transform duration-300 backdrop-blur-sm border-b border-gray-200",
+        isScrolled ? "translate-y-0" : "-translate-y-full"
+      )}>
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          {/* Left side - Logo and Company Name */}
+          <div className="flex items-center space-x-3">
+            <Image
+              src="/logistics logo.jpg"
+              alt="Green Ocean Logo"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+            <span className="text-lg font-semibold text-gray-900">Green Ocean</span>
+          </div>
+
+          {/* Middle - Services */}
+          <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 overflow-x-auto px-4">
+            <div className="flex space-x-1 sm:space-x-2 md:space-x-3 overflow-x-auto">
+              {services.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleServiceClick(item.id)}
+                  className={cn(
+                    "flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex-shrink-0",
+                    activeService === item.id ? "bg-teal-500 text-white" : "hover:bg-gray-100"
+                  )}
+                >
+                  <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-xs sm:text-sm font-medium hidden xs:block">{item.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right side - Notification and User */}
+          <div className="flex items-center space-x-4">
+            <button className="relative inline-flex items-center p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={toggleNewsPanel}>
+              <Bell className="h-5 w-5 text-gray-600" />
+              <span className="flex h-4 w-4 items-center justify-center bg-red-500 text-[10px] text-white rounded-full ml-1">2</span>
+            </button>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">JD</span>
                 </div>
+                <span className="text-sm font-medium text-gray-700 hidden sm:inline-block">John Doe</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+
+      {/* Add News Panel and Backdrop */}
+      {isNewsPanelOpen && (
+        <div 
+          className="fixed inset-0 bg-white/30 backdrop-blur-md z-[45] transition-all duration-300"
+          onClick={closeNewsPanel}
+        />
+      )}
+
+      <div
+        className={`fixed right-0 top-20 bottom-0 w-full max-w-md bg-white/80 backdrop-blur-sm shadow-lg border-l transform transition-transform duration-300 z-[46] overflow-y-auto ${
+          isNewsPanelOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+          <h3 className="text-lg font-semibold">News & Updates</h3>
+          <Button variant="ghost" size="sm" className="rounded-full" onClick={closeNewsPanel}>
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+        <div className="p-4">
+          {/* News Items */}
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <Info className="h-5 w-5 text-blue-500 mt-1" />
+              <div>
+                <h4 className="font-medium">System Update</h4>
+                <p className="text-sm text-gray-600">New features added to tracking system</p>
+                <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-500 mt-1" />
+              <div>
+                <h4 className="font-medium">Delivery Complete</h4>
+                <p className="text-sm text-gray-600">Order #123456 has been delivered</p>
+                <p className="text-xs text-gray-400 mt-1">5 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

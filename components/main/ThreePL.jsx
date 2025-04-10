@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter} from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -11,6 +12,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ThreePLCard = ({ title, location, rating, description, images }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -85,21 +92,20 @@ const ThreePLCard = ({ title, location, rating, description, images }) => {
           <p className="mt-3 text-sm text-gray-600">{description}</p>
         </div>
         
- <div className="flex gap-4 mt-4">
-           <Button 
-             className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
-             onClick={() => setLoginModalOpen(true)}
-           >
-             View Details
-           </Button>
-           <Button 
-             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-             onClick={() => setLoginModalOpen(true)}
-           >
-             Book Now
-           </Button>
-         </div>
-       
+        <div className="flex gap-4 mt-4">
+          <Button 
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+            onClick={() => setLoginModalOpen(true)}
+          >
+            View Details
+          </Button>
+          <Button 
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => setLoginModalOpen(true)}
+          >
+            Book Now
+          </Button>
+        </div>
       </div>
       
       {/* Login Dialog */}
@@ -167,14 +173,9 @@ const ThreePLCard = ({ title, location, rating, description, images }) => {
   );
 };
 
-const ThreePL  = () => {
-  const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
+const ThreePL = () => {
+  const router = useRouter();
 
-  const toggleNewsPanel = () => {
-    setIsNewsPanelOpen(!isNewsPanelOpen);
-  };
-
-  // 3PL services data
   const threePLServices = [
     {
       id: 1,
@@ -182,11 +183,7 @@ const ThreePL  = () => {
       location: "Multiple Locations, Pan-India",
       rating: 4.8,
       description: "End-to-end supply chain management with custom solutions for inventory, distribution, and fulfillment.",
-      images: [
-        "/Thor.jpg",
-        "/Thor1.jpg",
-        "/Thor2.jpg",
-      ]
+      images: ["/Thor.jpg", "/Thor1.jpg", "/Thor2.jpg"]
     },
     {
       id: 2,
@@ -194,47 +191,31 @@ const ThreePL  = () => {
       location: "Bangalore, Karnataka",
       rating: 4.6,
       description: "Specialized fulfillment services for online retailers with fast processing and same-day shipping options.",
-      images: [
-        "/Loki.jpg",
-        "/Loki1.jpg",
-        "/loki2.jpg",
-      ]
+      images: ["/Loki.jpg", "/Loki1.jpg", "/loki2.jpg"]
     },
     {
       id: 3,
-      title: "Retail Distribution Network",
-      location: "Delhi-NCR Region",
+      title: "Customized Logistics Services",
+      location: "Hyderabad, Telangana",
       rating: 4.3,
-      description: "Strategic distribution services with multi-channel capabilities and retail compliance expertise.",
-      images: [
-        "/IronMan.jpg",
-        "/IronMan1.jpg",
-        "/IronMan2.png",
-      ]
+      description: "Tailored logistics solutions for specific industries with specialized expertise and customized processes.",
+      images: ["/Thanos.jpg", "/Thanos1.jpg", "/Thanos2.jpg"]
     },
     {
       id: 4,
-      title: "Value-Added Services Hub",
-      location: "Chennai, Tamil Nadu",
-      rating: 4.4,
-      description: "Comprehensive processing services including kitting, packaging, labeling, and quality control.",
-      images: [
-        "/Spiderman.jpg",
-        "/Spiderman1.jpg",
-        "/SpiderMan2.webp",
-      ]
+      title: "Warehousing and Distribution",
+      location: "Mumbai, Maharashtra",
+      rating: 4.5,
+      description: "Large-scale warehousing and distribution services with advanced technology and efficient operations.",
+      images: ["/Ironman.jpg", "/Ironman1.jpg", "/Ironman2.jpg"]
     }
   ];
 
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">3PL Services</h2>
-          </div>
-
-          
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">3PL Services</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6">

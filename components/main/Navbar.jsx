@@ -1,16 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X, Bell, Info, CheckCircle, Package, FileText, Ship } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from "../ui/button";
+import HeroSection from "./HeroSection";
 
-const Navbar = () => {
+const Navbar = ({ onSectionChange }) => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
+  const [showHeroInNav, setShowHeroInNav] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    let ticking = false;
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          
+          // Show/hide navbar based on scroll direction
+          setIsVisible(currentScrollY < lastScrollY || currentScrollY < 100);
+          setLastScrollY(currentScrollY);
+          
+          // Handle hero section in navbar
+          const threshold = 200;
+          setShowHeroInNav(currentScrollY > threshold);
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const toggleNewsPanel = () => {
     setIsNewsPanelOpen(!isNewsPanelOpen);
@@ -32,60 +62,75 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="text-black py-4 px-6 shadow-md bg-white sticky top-0 z-50">
-        <div className="container mx-auto flex flex-wrap justify-between items-center">
-          <div 
-            className="flex items-center space-x-4 cursor-pointer"
-            onClick={handleLogoClick}
-          >
-            <Image
-              src="/logistics logo.jpg"
-              alt="Logistics Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-              priority
-            />
-            <span className="text-2xl font-bold">
-              Green Ocean
-            </span>
-          </div>
-          
-          <button 
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
-          <nav className={`w-full md:w-auto md:flex ${isMenuOpen ? 'block' : 'hidden'}`}>
-            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2 mt-4 md:mt-0">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
-                onClick={toggleNewsPanel}
-              >
-                <Bell className="h-4 w-4" />
-                News & Updates
-              </Button>
-              <Link 
-                href="/login" 
-                className="w-full md:w-auto px-4 py-2 bg-white text-teal-600 rounded-md font-medium hover:bg-gray-100 transition text-center border border-teal-600"
-                prefetch={false}
-              >
-                Login
-              </Link>
-              <Link 
-                href="/signup" 
-                className="w-full md:w-auto px-4 py-2 bg-teal-700 text-white rounded-md font-medium hover:bg-teal-800 transition text-center"
-                prefetch={false}
-              >
-                Sign Up
-              </Link>
+      <nav 
+        className={`text-black py-4 px-6 bg-white sticky top-0 z-50 transition-transform duration-300 ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
+        <div className="container mx-auto">
+          <div className="flex flex-wrap justify-between items-center">
+            <div 
+              className="flex items-center space-x-4 cursor-pointer"
+              onClick={handleLogoClick}
+            >
+              <Image
+                src="/logistics logo.jpg"
+                alt="Logistics Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+                priority
+              />
+              <span className="text-2xl font-bold">
+                Green Ocean
+              </span>
             </div>
-          </nav>
+            
+            {showHeroInNav && (
+              <div className="flex-1 mx-4 hidden md:block">
+                <HeroSection 
+                  isInNavbar={true} 
+                  onSectionChange={onSectionChange} 
+                />
+              </div>
+            )}
+
+            <button 
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <nav className={`w-full md:w-auto md:flex ${isMenuOpen ? 'block' : 'hidden'}`}>
+              <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2 mt-4 md:mt-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
+                  onClick={toggleNewsPanel}
+                >
+                  <Bell className="h-4 w-4" />
+                  <span className="flex h-4 w-4 items-center justify-center bg-red-500 text-[10px] text-white rounded-full">2</span>
+                </Button>
+                <Link 
+                  href="/login" 
+                  className="w-full md:w-auto px-4 py-2 bg-white text-teal-600 rounded-md font-medium hover:bg-gray-100 transition text-center border border-teal-600"
+                  prefetch={false}
+                >
+                  Login
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="w-full md:w-auto px-4 py-2 bg-teal-700 text-white rounded-md font-medium hover:bg-teal-800 transition text-center"
+                  prefetch={false}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </nav>
+          </div>
         </div>
       </nav>
 

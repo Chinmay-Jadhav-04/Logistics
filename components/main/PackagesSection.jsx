@@ -4,7 +4,14 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter} from 'lucide-react';
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Tabs,
   TabsContent,
@@ -25,9 +32,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const CFSCard = ({ title, location, rating, description, images }) => {
+const CFSCard = ({ title, location, rating, description, images, id }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const router = useRouter();
+
+  // Function to check if user is logged in
+  const isUserLoggedIn = () => {
+    return localStorage.getItem('user') !== null;
+  };
+
+  const handleBookNow = () => {
+    if (isUserLoggedIn()) {
+      // Add booking logic here
+      router.push(`/booking/${id}`);
+    } else {
+      setLoginModalOpen(true);
+    }
+  };
+
+  const handleViewDetails = () => {
+    // Directly navigate to details page without login check
+    router.push(`/view-details/${id}`);
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -101,26 +128,26 @@ const CFSCard = ({ title, location, rating, description, images }) => {
         <div className="flex gap-4 mt-4">
           <Button 
             className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
-            onClick={() => setLoginModalOpen(true)}
+            onClick={handleViewDetails}
           >
             View Details
           </Button>
           <Button 
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setLoginModalOpen(true)}
+            onClick={handleBookNow}
           >
             Book Now
           </Button>
         </div>
       </div>
       
-      {/* Login Dialog */}
+      {/* Login Dialog - Only shown for booking */}
       <Dialog open={loginModalOpen} onOpenChange={setLoginModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Login Required</DialogTitle>
             <DialogDescription>
-              Please log in to view detailed information about this CFS facility.
+              Please log in to book this CFS facility.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
@@ -182,8 +209,12 @@ const CFSCard = ({ title, location, rating, description, images }) => {
 const PackagesSection = () => {
   const router = useRouter();
   const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [locationFilter, setLocationFilter] = useState("all");
+  const [tariffFilter, setTariffFilter] = useState("all");
+  const [freeDaysFilter, setFreeDaysFilter] = useState("all");
+  const [monthlyDuesFilter, setMonthlyDuesFilter] = useState("all");
+  const [containersFilter, setContainersFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   const toggleNewsPanel = () => {
     setIsNewsPanelOpen(!isNewsPanelOpen);
@@ -194,14 +225,6 @@ const PackagesSection = () => {
     // Replace this with your actual authentication check
     // For example, checking localStorage, JWT token, or session
     return localStorage.getItem('user') !== null;
-  };
-
-  const handleViewDetails = (id) => {
-    if (isUserLoggedIn()) {
-      router.push(`/view-details/${id}`);
-    } else {
-      setLoginModalOpen(true);
-    }
   };
 
   // CFS facilities data
@@ -216,7 +239,11 @@ const PackagesSection = () => {
         "/images 1.jpg",
         "/images 2.jpg",
         "/images 3.jpg",
-      ]
+      ],
+      tariffRate: "5001-10000",
+      freeDays: "15 days",
+      monthlyDues: "10000-20000",
+      containers: "20-50"
     },
     {
       id: 2,
@@ -228,7 +255,11 @@ const PackagesSection = () => {
         "/dosa.jpg",
         "/dosa1.jpg",
         "/dosa3.jpg",
-      ]
+      ],
+      tariffRate: "10001-15000",
+      freeDays: "7 days",
+      monthlyDues: "15000-25000",
+      containers: "1-20"
     },
     {
       id: 3,
@@ -240,7 +271,11 @@ const PackagesSection = () => {
         "/Momo.jpg",
         "/Momo1.jpg",
         "/Momo2.jpg",
-      ]
+      ],
+      tariffRate: "0-5000",
+      freeDays: "30 days",
+      monthlyDues: "5000-10000",
+      containers: "50+"
     },
     {
       id: 4,
@@ -252,7 +287,11 @@ const PackagesSection = () => {
         "/Puchka2.0.jpg",
         "/Puchka2.jpg",
         "/Puchka3.0.jpg",
-      ]
+      ],
+      tariffRate: "15000+",
+      freeDays: "15 days",
+      monthlyDues: "20000-30000",
+      containers: "20-50"
     }
   ];
 
@@ -260,59 +299,158 @@ const PackagesSection = () => {
   const locations = ["all", ...new Set(cfsFacilities.map(facility => facility.location))];
 
   // Update the filtered facilities
-  const filteredFacilities = cfsFacilities.filter(facility => 
-    locationFilter === "all" || facility.location === locationFilter
-  );
+  const filteredFacilities = cfsFacilities.filter(facility => {
+    return (locationFilter === "all" || facility.location === locationFilter) &&
+           (tariffFilter === "all" || facility.tariffRate === tariffFilter) &&
+           (freeDaysFilter === "all" || facility.freeDays === freeDaysFilter) &&
+           (monthlyDuesFilter === "all" || facility.monthlyDues === monthlyDuesFilter) &&
+           (containersFilter === "all" || facility.containers === containersFilter);
+  });
 
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">CFS/ICD Facilities</h2>
-          </div>
-
-          <div className="flex items-center mt-4 md:mt-0 space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  className="flex flex-col items-center px-3 py-2 transition-all bg-teal-600 text-white rounded-full hover:bg-teal-700"
-                >
-                  <Filter className="h-6 w-6" />
-                  <span className="text-xs font-medium mt-1">Filter</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <div className="p-2 text-sm font-medium text-gray-500">Filter by Location</div>
+        {/* Mobile Filter Button */}
+        <div className="md:hidden mb-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2 bg-white"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+            </Button>
+            <Select
+              value={locationFilter}
+              onValueChange={(value) => setLocationFilter(value)}
+            >
+              <SelectTrigger className="w-full bg-white">
+                <SelectValue placeholder="Location" />
+              </SelectTrigger>
+              <SelectContent>
                 {locations.map((location) => (
-                  <DropdownMenuItem
-                    key={location}
-                    className={`flex items-center gap-2 ${
-                      locationFilter === location ? 'bg-teal-50 text-teal-600' : ''
-                    }`}
-                    onClick={() => setLocationFilter(location)}
-                  >
-                    <MapPin className="h-4 w-4" />
-                    {location === "all" ? "All Locations" : location.split(",")[0]}
-                  </DropdownMenuItem>
+                  <SelectItem key={location} value={location}>
+                    {location === "all" ? "All Locations" : location}
+                  </SelectItem>
                 ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Mobile Filters Panel */}
+          <div className={`${showFilters ? 'block' : 'hidden'} mt-4 bg-white p-4 rounded-lg shadow-md`}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tariff Rates
+                </label>
+                <select
+                  value={tariffFilter}
+                  onChange={(e) => setTariffFilter(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="all">All Rates</option>
+                  <option value="0-5000">₹0 - ₹5000</option>
+                  <option value="5001-10000">₹5001 - ₹10000</option>
+                  <option value="10001-15000">₹10001 - ₹15000</option>
+                  <option value="15000+">₹15000+</option>
+                </select>
+              </div>
+              {/* Add other filter options here */}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {filteredFacilities.map((facility) => (
-            <CFSCard 
-              key={facility.id}
-              title={facility.title}
-              location={facility.location}
-              rating={facility.rating}
-              description={facility.description}
-              images={facility.images}
-            />
-          ))}
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Desktop Filter Panel - Hidden on Mobile */}
+          <div className="hidden md:block w-64 bg-white p-4 rounded-lg shadow-md h-fit">
+            <h3 className="text-lg font-semibold mb-4">Filter Options</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tariff Rates
+                </label>
+                <select
+                  value={tariffFilter}
+                  onChange={(e) => setTariffFilter(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="all">All Rates</option>
+                  <option value="0-5000">₹0 - ₹5000</option>
+                  <option value="5001-10000">₹5001 - ₹10000</option>
+                  <option value="10001-15000">₹10001 - ₹15000</option>
+                  <option value="15000+">₹15000+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Free Days
+                </label>
+                <select
+                  value={freeDaysFilter}
+                  onChange={(e) => setFreeDaysFilter(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="all">All Days</option>
+                  <option value="7 days">7 Days</option>
+                  <option value="15 days">15 Days</option>
+                  <option value="30 days">30 Days</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Monthly Dues
+                </label>
+                <select
+                  value={monthlyDuesFilter}
+                  onChange={(e) => setMonthlyDuesFilter(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="all">All Ranges</option>
+                  <option value="Below 10000">Below ₹10000</option>
+                  <option value="10000-20000">₹10000 - ₹20000</option>
+                  <option value="Above 20000">Above ₹20000</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Containers
+                </label>
+                <select
+                  value={containersFilter}
+                  onChange={(e) => setContainersFilter(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="all">All Sizes</option>
+                  <option value="1-20">1-20</option>
+                  <option value="20-50">20-50</option>
+                  <option value="50+">50+</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Cards */}
+          <div className="flex-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">CFS/ICD Facilities</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {filteredFacilities.map((facility) => (
+                <CFSCard 
+                  key={facility.id}
+                  title={facility.title}
+                  location={facility.location}
+                  rating={facility.rating}
+                  description={facility.description}
+                  images={facility.images}
+                  id={facility.id}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
