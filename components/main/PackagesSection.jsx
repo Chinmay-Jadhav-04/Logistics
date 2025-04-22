@@ -127,13 +127,13 @@ const CFSCard = ({ title, location, rating, description, images, id }) => {
         
         <div className="flex gap-4 mt-4">
           <Button 
-            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-6 px-8"
             onClick={handleViewDetails}
           >
             View Details
           </Button>
           <Button 
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-6 px-8"
             onClick={handleBookNow}
           >
             Book Now

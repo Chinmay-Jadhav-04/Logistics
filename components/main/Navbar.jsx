@@ -1,9 +1,11 @@
+// Modify Navbar.js
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Bell, Info, CheckCircle, Package, FileText, Ship } from 'lucide-react';
+import { Menu, X, Bell, Info, CheckCircle, Package, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from "../ui/button";
 import HeroSection from "./HeroSection";
@@ -15,6 +17,7 @@ const Navbar = ({ onSectionChange }) => {
   const [showHeroInNav, setShowHeroInNav] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [atPageTop, setAtPageTop] = useState(true);
 
   useEffect(() => {
     let ticking = false;
@@ -24,14 +27,30 @@ const Navbar = ({ onSectionChange }) => {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
           
-          // Show/hide navbar based on scroll direction
-          setIsVisible(currentScrollY < lastScrollY || currentScrollY < 100);
+          // Check if we're at the very top of the page
+          const isTop = currentScrollY === 0;
+          setAtPageTop(isTop);
+          
+          // Show original navbar only when at the very top
+          if (isTop) {
+            setShowHeroInNav(false);
+            setIsVisible(true);
+          } 
+          // When scrolled but not at top, always show the hero nav
+          else {
+            setShowHeroInNav(true);
+            
+            // When scrolling down, hide the navbar
+            if (currentScrollY > lastScrollY) {
+              setIsVisible(false);
+            } 
+            // When scrolling up, show the navbar
+            else {
+              setIsVisible(true);
+            }
+          }
+
           setLastScrollY(currentScrollY);
-          
-          // Handle hero section in navbar
-          const threshold = 200;
-          setShowHeroInNav(currentScrollY > threshold);
-          
           ticking = false;
         });
         ticking = true;
@@ -52,21 +71,24 @@ const Navbar = ({ onSectionChange }) => {
 
   const handleLogoClick = () => {
     router.push('/');
+    // Wait for navigation to complete and DOM to update
     setTimeout(() => {
-      const cfsButton = document.querySelector('button[data-id="cfs-icd"]');
+      const cfsButton = document.querySelector('[data-id="cfs-icd"]');
       if (cfsButton) {
         cfsButton.click();
       }
-    }, 100);
+    }, 300); // Increased timeout to ensure DOM is ready
   };
 
   return (
     <>
+      {/* Original navbar - only visible when at the very top */}
       <nav 
-        className={`text-black py-4 px-6 bg-white sticky top-0 z-50 transition-transform duration-300 ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
+        className={`text-black py-4 px-6 bg-white w-full z-50 transition-opacity duration-300 ${
+          atPageTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
+        {/* Your original navbar content */}
         <div className="container mx-auto">
           <div className="flex flex-wrap justify-between items-center">
             <div 
@@ -86,15 +108,6 @@ const Navbar = ({ onSectionChange }) => {
               </span>
             </div>
             
-            {showHeroInNav && (
-              <div className="flex-1 mx-4 hidden md:block">
-                <HeroSection 
-                  isInNavbar={true} 
-                  onSectionChange={onSectionChange} 
-                />
-              </div>
-            )}
-
             <button 
               className="md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -130,6 +143,56 @@ const Navbar = ({ onSectionChange }) => {
                 </Link>
               </div>
             </nav>
+          </div>
+        </div>
+      </nav>
+
+      {/* Scrolled navbar with hero - visible when scrolled */}
+      <nav 
+        className={`text-black py-4 px-6 bg-white fixed w-full top-0 z-50 transition-transform duration-300 shadow-md ${
+          !atPageTop ? (isVisible ? 'translate-y-0' : '-translate-y-full') : '-translate-y-full'
+        }`}
+      >
+        <div className="container mx-auto">
+          <div className="flex flex-wrap justify-between items-center">
+            <div 
+              className="flex items-center space-x-4 cursor-pointer"
+              onClick={handleLogoClick}
+            >
+              <Image
+                src="/logistics logo.jpg"
+                alt="Logistics Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+                priority
+              />
+              <span className="text-2xl font-bold">
+                Green Ocean
+              </span>
+            </div>
+            
+            {showHeroInNav && (
+              <div className="flex-1 mx-4 hidden md:block">
+                <HeroSection 
+                  isInNavbar={true} 
+                  onSectionChange={onSectionChange} // Make sure this prop is passed
+                  disableFixedHeader={true}
+                />
+              </div>
+            )}
+
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-700 transition-all duration-300" 
+                onClick={toggleNewsPanel}
+              >
+                <Bell className="h-4 w-4" />
+                <span className="flex h-4 w-4 items-center justify-center bg-red-500 text-[10px] text-white rounded-full">2</span>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>

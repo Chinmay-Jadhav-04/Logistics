@@ -249,7 +249,7 @@ export default function ViewDetails({ params }) {
               </Button>
               
               <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 flex-1"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-6 px-8 flex-1"
                 onClick={handleBookNow}
               >
                 Book Now

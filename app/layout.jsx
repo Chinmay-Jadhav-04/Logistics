@@ -3,51 +3,50 @@
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import Navbar from "@/components/main/Navbar";
+import AuthenticatedNavbar from "@/components/main/AuthenticatedNavbar";
 import Footer from "@/components/main/Footer";
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import SplashScreen from '@/components/main/SplashScreen';
+import { Toaster } from 'sonner'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
 
-export default function RootLayout({ children }) {
-  const [loading, setLoading] = useState(true);
+function MainLayout({ children }) {
+  const { user, loading } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Reset loading state on route change or page refresh
-    setLoading(true);
+    if (!loading) {
+      setIsLoading(false);
+    }
+  }, [loading]);
 
-    // Optional: Add event listener for route changes if using Next.js routing
-    const handleRouteChange = () => {
-      setLoading(true);
-    };
+  if (isLoading) {
+    return <SplashScreen finishLoading={() => setIsLoading(false)} />;
+  }
 
-    window.addEventListener('beforeunload', handleRouteChange);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleRouteChange);
-    };
-  }, []);
+  return (
+    <div style={{ opacity: isLoading ? 0 : 1 }}>
+      {user ? <AuthenticatedNavbar /> : <Navbar />}
+      {children}
+      <Footer />
+    </div>
+  );
+}
 
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
-          {loading ? (
-            <SplashScreen finishLoading={() => setLoading(false)} />
-          ) : null}
-          <div style={{ opacity: loading ? 0 : 1 }}>
-            <Navbar />
-            {children}
-            <Footer />
-          </div>
+          <MainLayout>{children}</MainLayout>
         </AuthProvider>
       </body>
     </html>
   );
 }
-
 

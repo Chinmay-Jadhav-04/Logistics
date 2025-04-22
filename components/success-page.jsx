@@ -1,20 +1,41 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import ProgressSteps from "./progress-steps"
 import { Check } from "lucide-react"
 
 export default function SuccessPage({ onNext, formData }) {
   const [showConfetti, setShowConfetti] = useState(false)
+  const router = useRouter()
 
+  // Effect for confetti animation
   useEffect(() => {
-    // Trigger confetti after a short delay
     const timer = setTimeout(() => {
       setShowConfetti(true)
     }, 300)
 
     return () => clearTimeout(timer)
   }, [])
+
+  // Separate effect for navigation
+  useEffect(() => {
+    // Check if we're on the home page
+    if (window.location.pathname === '/') {
+      const timer = setTimeout(() => {
+        const cfsButton = document.querySelector('[data-id="cfs-icd"]')
+        if (cfsButton) {
+          cfsButton.click()
+        }
+      }, 500) // Increased timeout to ensure DOM is ready
+
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const handleContinue = () => {
+    router.push('/')
+  }
 
   // Generate confetti pieces
   const confettiPieces = Array.from({ length: 50 }).map((_, index) => {
@@ -50,14 +71,14 @@ export default function SuccessPage({ onNext, formData }) {
         <div className="mb-8 flex flex-col items-center">
           {/* Animated checkmark with pulsing ring */}
           <div className="relative mb-4">
-            <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-pulse-ring"></div>
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary animate-scale-in">
-              <Check className="h-8 w-8 text-primary-foreground" />
+            <div className="absolute inset-0 rounded-full bg-teal-700 opacity-20 animate-pulse-ring"></div>
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-teal-700 animate-scale-in">
+              <Check className="h-8 w-8 text-white" />
             </div>
           </div>
 
           {/* Animated heading */}
-          <h1 className="mb-2 text-2xl font-bold text-primary animate-fade-in-up animation-delay-100">
+          <h1 className="mb-2 text-2xl font-bold text-teal-700 animate-fade-in-up animation-delay-100">
             Successfully Verified!
           </h1>
 
@@ -72,8 +93,8 @@ export default function SuccessPage({ onNext, formData }) {
         {/* Animated button */}
         <button
           type="button"
-          onClick={onNext}
-          className="w-full rounded-md bg-primary py-2 text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 animate-bounce-in animation-delay-300"
+          onClick={handleContinue}
+          className="w-full rounded-md bg-teal-700 py-2 text-white transition-colors hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 animate-bounce-in animation-delay-300"
         >
           Continue to Logistics
         </button>
@@ -81,3 +102,5 @@ export default function SuccessPage({ onNext, formData }) {
     </div>
   )
 }
+
+

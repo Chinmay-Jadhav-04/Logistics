@@ -17,7 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-const HeroSection = ({ onSectionChange }) => {
+const HeroSection = ({ onSectionChange = () => {}, isInNavbar = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeService, setActiveService] = useState(null);
   const [isNewsPanelOpen, setIsNewsPanelOpen] = useState(false);
