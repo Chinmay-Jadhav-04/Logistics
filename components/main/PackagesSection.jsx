@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter} from 'lucide-react';
+import { Bell, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Filter, Award, ThumbsUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,10 +32,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const CFSCard = ({ title, location, rating, description, images, id }) => {
+const CFSCard = ({ title, location, rating, description, images, id, services, facilities }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const router = useRouter();
+
+  // Badge logic
+  const getBadgeType = () => {
+    if (rating >= 4.5 && services >= 4 && facilities >= 3) {
+      return {
+        text: "",
+        color: "bg-emerald-500",
+        icon: Award
+      }
+    } 
+    return null;
+  };
+
+  const badge = getBadgeType();
 
   // Function to check if user is logged in
   const isUserLoggedIn = () => {
@@ -73,6 +87,14 @@ const CFSCard = ({ title, location, rating, description, images, id }) => {
           alt={`${title} - Image ${currentImageIndex + 1}`}
           className="w-full h-full object-cover"
         />
+        
+        {/* Badge */}
+        {badge && (
+          <div className={`absolute top-2 left-2 ${badge.color} text-white px-3 py-1 rounded-full flex items-center space-x-1 z-10`}>
+            <badge.icon className="w-4 h-4" />
+            <span className="text-sm font-medium">{badge.text}</span>
+          </div>
+        )}
         
         {/* Image navigation buttons */}
         <div className="absolute inset-y-0 left-0 flex items-center">
@@ -231,34 +253,38 @@ const PackagesSection = () => {
   const cfsFacilities = [
     {
       id: 1,
-      title: "Mumbai CFS Terminal",
-      location: "Nhava Sheva, Mumbai, Maharashtra",
-      rating: 4.5,
-      description: "State-of-the-art Container Freight Station with modern facilities and efficient clearance process.",
+      title: "Gateway Distriparks Limited",
+      location: "Nhava Sheva, Mumbai",
+      rating: 4.8,
+      services: 4,
+      facilities: 3,
+      description: "India's Leading Integrated Intermodal Logistics Company.",
       images: [
-        "/images 1.jpg",
-        "/images 2.jpg",
-        "/images 3.jpg",
+       "/GatewayCFS.jpg",
+        "/GatewayCFS1.jpg",
+        "/GatewayCFS2.jpg",
       ],
       tariffRate: "5001-10000",
-      freeDays: "15 days",
+      freeDays: "7 days",
       monthlyDues: "10000-20000",
       containers: "20-50"
     },
     {
       id: 2,
-      title: "Chennai Port CFS",
-      location: "Chennai Port, Tamil Nadu",
-      rating: 4.2,
-      description: "Well-connected CFS with extensive storage space and specialized handling equipment.",
+      title: "Chennai ICD",
+      location: "Chennai Port Trust",
+      rating: 4.3,
+      services: 4,
+      facilities: 2,
+      description: "Modern inland container depot with efficient customs clearance.",
       images: [
-        "/dosa.jpg",
-        "/dosa1.jpg",
-        "/dosa3.jpg",
+        "/Dosa.jpg",
+        "/Dosa1.jpg",
+        "/Dosa2.jpg",
       ],
       tariffRate: "10001-15000",
-      freeDays: "7 days",
-      monthlyDues: "15000-25000",
+      freeDays: "10 days",
+      monthlyDues: "Above 20000",
       containers: "1-20"
     },
     {
@@ -447,6 +473,8 @@ const PackagesSection = () => {
                   description={facility.description}
                   images={facility.images}
                   id={facility.id}
+                  services={facility.services}
+                  facilities={facility.facilities}
                 />
               ))}
             </div>

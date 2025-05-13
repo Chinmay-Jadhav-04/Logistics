@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import SplashScreen from '@/components/main/SplashScreen';
 import { Toaster } from 'sonner'
+import ChatBot from '@/components/main/ChatBot';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ function MainLayout({ children }) {
       {user ? <AuthenticatedNavbar /> : <Navbar />}
       {children}
       <Footer />
+      <ChatBot />
     </div>
   );
 }
@@ -44,6 +46,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
           <MainLayout>{children}</MainLayout>
+          <Toaster position="top-right" />
         </AuthProvider>
       </body>
     </html>

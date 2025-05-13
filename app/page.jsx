@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Splashscreen from '../components/main/SplashScreen';
 import HeroSection from '@/components/main/HeroSection';
 import PackagesSection from '@/components/main/PackagesSection';
@@ -9,10 +9,11 @@ import ThreePL from '@/components/main/ThreePL';
 import BondedWarehouse from '@/components/main/BondedWarehouse';
 import MyOrders from '@/components/main/MyOrders';
 
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('hero');
-
+ 
   useEffect(() => {
     // Simulate data loading
     const fetchData = async () => {
@@ -42,10 +43,28 @@ export default function Home() {
         {activeSection === '3pl' && <ThreePL />}
         {activeSection === 'bonded-warehouse' && <BondedWarehouse />}
         {activeSection === 'my-orders' && <MyOrders />}
+       
       </div>
     </main>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
