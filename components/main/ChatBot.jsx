@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import './chatbot.css';
 
 export default function ChatBot() {
   // Start with the chatbot closed
@@ -11,6 +10,8 @@ export default function ChatBot() {
   const [input, setInput] = useState('');
   // Initialize with current time to start the proactive messaging
   const [lastProactiveTime, setLastProactiveTime] = useState(Date.now());
+  // Track if user has dismissed the notification
+  const [longDismissal, setLongDismissal] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Knowledge base for the chatbot
@@ -198,7 +199,11 @@ export default function ChatBot() {
     const proactiveInterval = setInterval(() => {
       // Show proactive message every 15 seconds if the chat isn't open
       const currentTime = Date.now();
-      if (!isOpen && currentTime - lastProactiveTime > 15 * 1000) {
+
+      // Check if we should show a notification based on time and dismissal state
+      const timeToWait = longDismissal ? 15 * 60 * 1000 : 15 * 1000; // 15 minutes or 15 seconds
+
+      if (!isOpen && currentTime - lastProactiveTime > timeToWait) {
         // Show a temporary notification without opening the full chat
         const proactiveMessages = [
           "Are you facing any difficulties with your logistics needs? I'm here to help!",
@@ -209,15 +214,30 @@ export default function ChatBot() {
 
         const randomMessage = proactiveMessages[Math.floor(Math.random() * proactiveMessages.length)];
 
-        // Create and show a temporary notification
+        // Create and show a temporary notification with Tailwind classes
         const notification = document.createElement('div');
-        notification.className = 'chatbot-notification';
+        notification.className = 'fixed bottom-[90px] right-5 w-[300px] bg-white rounded-xl shadow-lg z-[1001] overflow-hidden animate-[slideIn_0.3s_ease-out]';
+        notification.style.animation = 'slideIn 0.3s ease-out';
+
+        // Define the animation in a style tag if it doesn't exist
+        if (!document.getElementById('chatbot-animations')) {
+          const style = document.createElement('style');
+          style.id = 'chatbot-animations';
+          style.textContent = `
+            @keyframes slideIn {
+              from { transform: translateY(20px); opacity: 0; }
+              to { transform: translateY(0); opacity: 1; }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
         notification.innerHTML = `
-          <div class="notification-content">
-            <p>${randomMessage}</p>
-            <div class="notification-buttons">
-              <button class="notification-yes">Yes, I need help</button>
-              <button class="notification-no">No, thanks</button>
+          <div class="p-4">
+            <p class="m-0 mb-3 text-gray-800 text-sm">${randomMessage}</p>
+            <div class="flex justify-between mt-3">
+              <button class="bg-teal-600 text-white px-3 py-2 rounded-md text-xs cursor-pointer border-none hover:bg-teal-700 transition-colors">Yes, I need help</button>
+              <button class="bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-xs cursor-pointer border-none hover:bg-gray-200 transition-colors">No, thanks</button>
             </div>
           </div>
         `;
@@ -225,16 +245,19 @@ export default function ChatBot() {
         document.body.appendChild(notification);
 
         // Add event listeners to the buttons
-        const yesButton = notification.querySelector('.notification-yes');
-        const noButton = notification.querySelector('.notification-no');
+        const yesButton = notification.querySelector('button:first-child');
+        const noButton = notification.querySelector('button:last-child');
 
         yesButton.addEventListener('click', () => {
           setIsOpen(true);
           document.body.removeChild(notification);
+          setLongDismissal(false); // Reset the dismissal state
         });
 
         noButton.addEventListener('click', () => {
           document.body.removeChild(notification);
+          setLongDismissal(true); // Set long dismissal when user clicks "No, thanks"
+          setLastProactiveTime(Date.now()); // Update the time
         });
 
         // Auto-remove the notification after 10 seconds if no action is taken
@@ -246,16 +269,16 @@ export default function ChatBot() {
 
         setLastProactiveTime(currentTime);
       }
-    }, 15 * 1000); // Check every 15 seconds
+    }, 5 * 1000); // Check every 5 seconds
 
     return () => clearInterval(proactiveInterval);
-  }, [isOpen, lastProactiveTime]);
+  }, [isOpen, lastProactiveTime, longDismissal]);
 
   return (
-    <div className="chatbot-container">
+    <div className="fixed bottom-5 right-5 z-50">
       {!isOpen ? (
         <button
-          className="chatbot-button"
+          className="w-14 h-14 rounded-full bg-teal-600 text-white flex items-center justify-center cursor-pointer shadow-lg border-none transition-all duration-300 hover:bg-teal-700 hover:scale-105"
           onClick={() => setIsOpen(true)}
           aria-label="Open chat"
         >
@@ -264,37 +287,47 @@ export default function ChatBot() {
           </svg>
         </button>
       ) : (
-        <div className="chatbot-window">
-          <div className="chatbot-header">
+        <div className="absolute bottom-20 right-0 w-[350px] h-[500px] bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
+          <div className="bg-teal-600 text-white p-4 font-semibold flex justify-between items-center">
             <span>Green Ocean Logistics Assistant</span>
             <button
-              className="chatbot-close"
+              className="bg-transparent border-none text-white cursor-pointer text-lg"
               onClick={() => setIsOpen(false)}
               aria-label="Close chat"
             >
               ✕
             </button>
           </div>
-          <div className="chatbot-messages">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`message ${msg.sender === 'bot' ? 'bot-message' : 'user-message'}`}
+                className={`mb-3 max-w-[80%] p-3 rounded-2xl break-words ${
+                  msg.sender === 'bot'
+                    ? 'self-start bg-teal-50 text-gray-800'
+                    : 'self-end bg-teal-600 text-white'
+                }`}
               >
                 {msg.text}
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
-          <div className="chatbot-input">
+          <div className="flex p-3 border-t border-gray-200">
             <input
               type="text"
+              className="flex-1 p-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask about our logistics services..."
             />
-            <button onClick={handleSend}>Send</button>
+            <button
+              className="bg-teal-600 text-white border-none rounded-r-full px-4 py-2 cursor-pointer hover:bg-teal-700"
+              onClick={handleSend}
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
